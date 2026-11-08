@@ -148,15 +148,15 @@
 
     // 2. Initialize Adsgram Controller
     // Replace YOUR_ADSGRAM_BLOCK_ID with your actual Block ID from partner.adsgram.ai
-    const ADSGRAM_BLOCK_ID = "58740";
-    let AdController = null;
+const ADSGRAM_BLOCK_ID = "58740";
 
-    if (window.Adsgram) {
-      AdController = window.Adsgram.init({
-        blockId: ADSGRAM_BLOCK_ID,
-        debug: true // Set to false in production
-      });
-    }
+let AdController = null;
+if (window.Adsgram) {
+  AdController = window.Adsgram.init({
+    blockId: ADSGRAM_BLOCK_ID,
+    debug: true // Keeps test mode active while you verify
+  });
+}
 
     let coinBalance = 0;
 
