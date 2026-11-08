@@ -3,29 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Adsgram Mini App Demo</title>
+  <title>Cyber Miner Mini App</title>
 
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
   <!-- Adsgram SDK -->
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
   <style>
     :root {
-      --bg: var(--tg-theme-bg-color, #0f172a);
-      --card: var(--tg-theme-secondary-bg-color, #1e293b);
-      --text: var(--tg-theme-text-color, #f8fafc);
-      --hint: var(--tg-theme-hint-color, #94a3b8);
-      --btn: var(--tg-theme-button-color, #38bdf8);
-      --btn-text: var(--tg-theme-button-text-color, #0f172a);
+      --bg: #090d16;
+      --card: #131b2e;
+      --accent: #38bdf8;
+      --gold: #f59e0b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -34,101 +36,254 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 16px;
+      justify-content: space-between;
     }
 
-    .card {
-      background-color: var(--card);
-      border-radius: 16px;
-      padding: 24px;
+    .container {
       width: 100%;
-      max-width: 360px;
-      text-align: center;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top User Header */
+    .header {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .avatar {
-      width: 70px;
-      height: 70px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: #334155;
+      background: #1e293b;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
-      margin: 0 auto 14px auto;
+      font-weight: bold;
+      color: var(--accent);
+      border: 1px solid var(--border);
     }
 
-    .points-box {
-      margin: 20px 0;
-      padding: 16px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .points-label {
-      font-size: 13px;
-      color: var(--hint);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .points-count {
-      font-size: 38px;
+    .badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      font-size: 11px;
       font-weight: 700;
-      color: #38bdf8;
-      margin-top: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
     }
 
-    button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      border-radius: 12px;
-      background-color: var(--btn);
-      color: var(--btn-text);
+    /* Balance Section */
+    .balance-card {
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .balance-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+
+    .balance-num {
+      font-size: 44px;
+      font-weight: 800;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Clicker Core */
+    .tap-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .gem-btn {
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #38bdf8, #0369a1);
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.3), inset 0 3px 6px rgba(255, 255, 255, 0.4);
+      border: 5px solid #0284c7;
+      font-size: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
+      outline: none;
+      transition: transform 0.08s ease;
     }
 
-    button:active {
-      transform: scale(0.98);
-      opacity: 0.9;
+    .gem-btn:active {
+      transform: scale(0.92);
     }
 
-    button:disabled {
+    /* Energy Bar */
+    .energy-wrapper {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 16px;
+    }
+
+    .energy-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .energy-progress-bg {
+      background: #1e293b;
+      height: 10px;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .energy-fill {
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      height: 100%;
+      width: 100%;
+      transition: width 0.2s ease;
+    }
+
+    /* Action Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .action-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .action-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
 
-    #status {
-      margin-top: 15px;
-      font-size: 13px;
-      color: var(--hint);
-      min-height: 20px;
+    /* Ad Booster Button (Optional reward) */
+    .ad-booster {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+    }
+
+    .ad-booster:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status-msg {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 16px;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <div class="avatar" id="user-avatar">👤</div>
-    <h2 id="username">Telegram User</h2>
-
-    <div class="points-box">
-      <div class="points-label">Total Coins</div>
-      <div class="points-count" id="coins">0</div>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="user-info">
+        <div class="avatar" id="avatar">👤</div>
+        <div>
+          <div id="user-name" style="font-size: 14px; font-weight: 700;">Player</div>
+          <div style="font-size: 11px; color: var(--muted);" id="user-lvl">Level 1 Miner</div>
+        </div>
+      </div>
+      <div class="badge" id="multiplier-badge">1x Power</div>
     </div>
 
-    <button id="ad-btn" onclick="showRewardedAd()">
-      🎬 Watch Ad (+50 Coins)
-    </button>
+    <!-- Balance -->
+    <div class="balance-card">
+      <div class="balance-label">Total Shards Mined</div>
+      <div class="balance-num">
+        <span>💎</span>
+        <span id="score">0</span>
+      </div>
+    </div>
 
-    <div id="status">Ready</div>
+    <!-- Gameplay Tap Object -->
+    <div class="tap-area">
+      <button class="gem-btn" id="tap-btn" onclick="mineGem()">💎</button>
+    </div>
+
+    <!-- Energy Section -->
+    <div class="energy-wrapper">
+      <div class="energy-meta">
+        <span>⚡ Energy</span>
+        <span id="energy-text">100 / 100</span>
+      </div>
+      <div class="energy-progress-bg">
+        <div class="energy-fill" id="energy-bar"></div>
+      </div>
+    </div>
+
+    <!-- Standard Gameplay Upgrades (No Ads Required) -->
+    <div class="grid">
+      <button class="action-btn" id="upgrade-btn" onclick="buyPickaxeUpgrade()">
+        <span>⛏️ Upgrade Pick</span>
+        <span style="font-size: 11px; color: var(--gold);" id="upgrade-cost">Cost: 25 💎</span>
+      </button>
+      <button class="action-btn" onclick="refillEnergySmall()">
+        <span>🔋 Snack Refill</span>
+        <span style="font-size: 11px; color: var(--accent);">+25 Energy (Free)</span>
+      </button>
+    </div>
+
+    <!-- Adsgram Optional Reward Booster -->
+    <button class="ad-booster" id="ad-btn" onclick="triggerAdsgramBooster()">
+      🎬 Watch Ad: Supercharge (+100 Energy & 2x Boost)
+    </button>
+    <div class="status-msg" id="status">Tap the gem to begin mining!</div>
   </div>
 
   <script>
@@ -137,61 +292,119 @@
     if (tg) {
       tg.ready();
       tg.expand();
-
-      // Read Telegram user profile details safely
       const user = tg.initDataUnsafe?.user;
       if (user) {
-        document.getElementById("username").innerText = user.first_name || "User";
-        document.getElementById("user-avatar").innerText = (user.first_name || "U")[0];
+        document.getElementById("user-name").innerText = user.first_name || "Miner";
+        document.getElementById("avatar").innerText = (user.first_name || "M")[0].toUpperCase();
       }
     }
 
-    // 2. Initialize Adsgram Controller
-    // Replace YOUR_ADSGRAM_BLOCK_ID with your actual Block ID from partner.adsgram.ai
-const ADSGRAM_BLOCK_ID = "58740";
+    // 2. Core Game State
+    let score = 0;
+    let energy = 100;
+    const maxEnergy = 100;
+    let tapPower = 1;
+    let boostMultiplier = 1;
+    let upgradeCost = 25;
 
-let AdController = null;
-if (window.Adsgram) {
-  AdController = window.Adsgram.init({
-    blockId: ADSGRAM_BLOCK_ID,
-    debug: true // Keeps test mode active while you verify
-  });
-}
-
-    let coinBalance = 0;
-
-    // 3. Trigger Rewarded Video
-    async function showRewardedAd() {
-      const statusEl = document.getElementById("status");
-      const btn = document.getElementById("ad-btn");
-
-      if (!AdController) {
-        statusEl.innerText = "Adsgram SDK not initialized or block ID missing.";
+    function mineGem() {
+      if (energy <= 0) {
+        showStatus("Out of energy! Wait for recharge or use a booster.");
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("warning");
         return;
       }
 
-      btn.disabled = true;
-      statusEl.innerText = "Loading ad...";
+      const yieldAmount = tapPower * boostMultiplier;
+      score += yieldAmount;
+      energy -= 1;
+      updateUI();
+
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+    }
+
+    function buyPickaxeUpgrade() {
+      if (score >= upgradeCost) {
+        score -= upgradeCost;
+        tapPower += 1;
+        upgradeCost = Math.round(upgradeCost * 1.8);
+        document.getElementById("upgrade-cost").innerText = `Cost: ${upgradeCost} 💎`;
+        document.getElementById("user-lvl").innerText = `Level ${tapPower} Miner`;
+        showStatus(`Upgraded! Taps now give +${tapPower * boostMultiplier} 💎`);
+        updateUI();
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+      } else {
+        showStatus(`Need ${upgradeCost} 💎 to upgrade!`);
+      }
+    }
+
+    function refillEnergySmall() {
+      if (energy >= maxEnergy) {
+        showStatus("Energy is already full!");
+        return;
+      }
+      energy = Math.min(maxEnergy, energy + 25);
+      updateUI();
+      showStatus("Restored +25 Energy!");
+    }
+
+    function updateUI() {
+      document.getElementById("score").innerText = score;
+      document.getElementById("energy-text").innerText = `${energy} / ${maxEnergy}`;
+      document.getElementById("energy-bar").style.width = `${(energy / maxEnergy) * 100}%`;
+      document.getElementById("multiplier-badge").innerText = `${boostMultiplier}x Power`;
+    }
+
+    function showStatus(text) {
+      document.getElementById("status").innerText = text;
+    }
+
+    // Passive Energy Recovery Loop
+    setInterval(() => {
+      if (energy < maxEnergy) {
+        energy += 1;
+        updateUI();
+      }
+    }, 2000);
+
+    // 3. Adsgram Controller with your block ID: 58755
+    let AdController = null;
+    if (window.Adsgram) {
+      AdController = window.Adsgram.init({
+        blockId: "58755",
+        debug: false
+      });
+    }
+
+    async function triggerAdsgramBooster() {
+      const adBtn = document.getElementById("ad-btn");
+
+      if (!AdController) {
+        showStatus("Ads network is loading, please try again in a moment.");
+        return;
+      }
+
+      adBtn.disabled = true;
+      showStatus("Preparing rewarded ad...");
 
       try {
-        const result = await AdController.show();
-        // The user watched the complete ad
-        coinBalance += 50;
-        document.getElementById("coins").innerText = coinBalance;
-        statusEl.innerText = "Success! +50 Coins earned.";
+        await AdController.show();
+        // Grant bonus
+        energy = maxEnergy;
+        boostMultiplier = 2;
+        updateUI();
+        showStatus("⚡ Supercharge activated! 2x Tap power for 60s.");
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
 
-        // Optional Telegram haptic feedback
-        if (tg?.HapticFeedback) {
-          tg.HapticFeedback.notificationOccurred("success");
-        }
+        setTimeout(() => {
+          boostMultiplier = 1;
+          updateUI();
+          showStatus("Supercharge expired. Normal power restored.");
+        }, 60000);
       } catch (err) {
-        console.error("Ad playback error/skipped:", err);
-        statusEl.innerText = "Ad was skipped or failed to load.";
-        if (tg?.HapticFeedback) {
-          tg.HapticFeedback.notificationOccurred("error");
-        }
+        console.error("Ad playback skipped/failed:", err);
+        showStatus("Ad not completed. Bonus was not applied.");
       } finally {
-        btn.disabled = false;
+        adBtn.disabled = false;
       }
     }
   </script>
