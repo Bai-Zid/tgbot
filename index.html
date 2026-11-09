@@ -7,8 +7,9 @@
 
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Adsgram SDK -->
-  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+
+  <!-- Monetag SDK Tag (Paste your exact script tag from Monetag dashboard here) -->
+  <!-- Example: <script src="//lib.monetag.com/..." data-zone="12222105"></script> -->
 
   <style>
     :root {
@@ -197,7 +198,7 @@
       cursor: not-allowed;
     }
 
-    /* Ad Booster Button (Optional reward) */
+    /* Monetag Rewarded Booster Button */
     .ad-booster {
       background: linear-gradient(135deg, #0284c7, #2563eb);
       border: none;
@@ -279,8 +280,8 @@
       </button>
     </div>
 
-    <!-- Adsgram Optional Reward Booster -->
-    <button class="ad-booster" id="ad-btn" onclick="triggerAdsgramBooster()">
+    <!-- Monetag Rewarded Booster Button -->
+    <button class="ad-booster" id="ad-btn" onclick="triggerMonetagAd()">
       🎬 Watch Ad: Supercharge (+100 Energy & 2x Boost)
     </button>
     <div class="status-msg" id="status">Tap the gem to begin mining!</div>
@@ -366,43 +367,42 @@
       }
     }, 2000);
 
-    // 3. Adsgram Controller with your block ID: 58755
-    let AdController = null;
-    if (window.Adsgram) {
-      AdController = window.Adsgram.init({
-        blockId: "58755",
-        debug: false
-      });
-    }
-
-    async function triggerAdsgramBooster() {
+    // 3. Monetag Rewarded Interstitial Trigger (Zone: 12222105)
+    async function triggerMonetagAd() {
       const adBtn = document.getElementById("ad-btn");
 
-      if (!AdController) {
-        showStatus("Ads network is loading, please try again in a moment.");
+      // Verify Monetag SDK function is loaded
+      if (typeof show_12222105 !== "function") {
+        showStatus("Ad script still loading or ad blocker active. Please wait...");
         return;
       }
 
       adBtn.disabled = true;
-      showStatus("Preparing rewarded ad...");
+      showStatus("Loading ad...");
 
       try {
-        await AdController.show();
-        // Grant bonus
-        energy = maxEnergy;
-        boostMultiplier = 2;
-        updateUI();
-        showStatus("⚡ Supercharge activated! 2x Tap power for 60s.");
-        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+        const result = await show_12222105();
 
-        setTimeout(() => {
-          boostMultiplier = 1;
+        // Monetag resolves on ad close; grant reward if viewed
+        // (Accepts standard resolve or valued reward event)
+        if (!result || result.reward_event_type === "valued" || result.reward_event_type === undefined) {
+          energy = maxEnergy;
+          boostMultiplier = 2;
           updateUI();
-          showStatus("Supercharge expired. Normal power restored.");
-        }, 60000);
+          showStatus("⚡ Supercharged! Energy refilled & 2x tap power for 60s.");
+          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+
+          setTimeout(() => {
+            boostMultiplier = 1;
+            updateUI();
+            showStatus("Supercharge expired. Normal power restored.");
+          }, 60000);
+        } else {
+          showStatus("Ad closed early without completion.");
+        }
       } catch (err) {
-        console.error("Ad playback skipped/failed:", err);
-        showStatus("Ad not completed. Bonus was not applied.");
+        console.error("Monetag ad error:", err);
+        showStatus("Ad failed to load or was skipped.");
       } finally {
         adBtn.disabled = false;
       }
